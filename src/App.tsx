@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AppLayout } from './components/layout/AppLayout';
 import { Dashboard } from './pages/Dashboard';
+import { PlayerEditor } from './pages/PlayerEditor';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -10,7 +11,7 @@ function App() {
       case 'dashboard':
         return <Dashboard />;
       case 'player':
-        return <div className="text-white">Player Editor (Coming Soon)</div>;
+        return <PlayerEditor />;
       case 'weapons':
         return <div className="text-white">Weapons Editor (Coming Soon)</div>;
       case 'vehicles':
