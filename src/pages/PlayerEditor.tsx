@@ -99,22 +99,27 @@ export const PlayerEditor: React.FC = () => {
                 { label: 'Fat', key: 'fat', max: 1000 },
                 { label: 'Stamina', key: 'stamina', max: 1000 },
                 { label: 'Muscle', key: 'muscle', max: 1000 },
-              ].map((stat) => (
-                <div key={stat.key}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <label className="font-medium text-neutral-400">{stat.label}</label>
-                    <span className="text-neutral-500">{player[stat.key as keyof typeof player]} / {stat.max}</span>
+              ].map((stat) => {
+                const value = player[stat.key as keyof typeof player] as number;
+                const displayValue = Math.max(0, Math.min(stat.max, Math.round(value)));
+
+                return (
+                  <div key={stat.key}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <label className="font-medium text-neutral-400">{stat.label}</label>
+                      <span className="text-neutral-500">{displayValue} / {stat.max}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max={stat.max}
+                      value={displayValue}
+                      onChange={(e) => handleStatChange(stat.key as keyof typeof player, e.target.value)}
+                      className="w-full accent-primary-500 h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
+                    />
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max={stat.max}
-                    value={player[stat.key as keyof typeof player]}
-                    onChange={(e) => handleStatChange(stat.key as keyof typeof player, e.target.value)}
-                    className="w-full accent-primary-500 h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
-                  />
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

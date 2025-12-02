@@ -54,16 +54,40 @@ export class SaveFileParser {
         console.log(`Parsing Block 15 (Ped Pool) at offset ${blockStart}, size ${blockSize}`);
 
         this.reader.seek(blockStart);
+
+        // Money is at offset 0x4 in Block 15
+        const money = this.reader.readInt32();
+        player.money = money;
+
         const pedStats = this.parsePedPool(blockSize);
         if (pedStats) {
           player = { ...player, ...pedStats };
         }
       } catch (e) {
-        console.error('Failed to parse Ped Pool:', e);
+        console.error('Failed to parse Block 15:', e);
         throw new Error(`Failed to parse player data (Block 15): ${(e as Error).message}`);
       }
     } else {
       console.warn('File does not have Block 15, using default player stats');
+    }
+
+    // Parse Block 16 (Player Stats)
+    if (blockPositions.length > 16) {
+      try {
+        const blockStart = blockPositions[16] + 5;
+        const blockEnd = blockPositions.length > 17 ? blockPositions[17] : this.buffer.byteLength;
+        const blockSize = blockEnd - blockStart;
+
+        console.log(`Parsing Block 16 (Player Stats) at offset ${blockStart}, size ${blockSize}`);
+
+        const additionalStats = this.parsePlayerStats(blockStart, blockSize);
+        if (additionalStats) {
+          player = { ...player, ...additionalStats };
+        }
+      } catch (e) {
+        console.error('Failed to parse Block 16:', e);
+        // Non-critical, continue with what we have
+      }
     }
 
     return {
@@ -110,6 +134,46 @@ export class SaveFileParser {
       maxHealth,
       armor
     };
+  }
+
+  private parsePlayerStats(blockStart: number, blockSize: number): Partial<PlayerStats> | null {
+    // Block 16 contains player stats like fat, stamina, muscle, respect, etc.
+
+    if (blockSize < 0x150) {
+      console.warn('Block 16 too small for player stats');
+      return null;
+    }
+
+    try {
+      // Fat: 0x54 (float)
+      this.reader.seek(blockStart + 0x54);
+      const fat = this.reader.readFloat();
+
+      // Stamina: 0x58 (float)
+      const stamina = this.reader.readFloat();
+
+      // Muscle: 0x5C (float)
+      const muscle = this.reader.readFloat();
+
+      // Skip to Respect: 0x100 (float)
+      this.reader.seek(blockStart + 0x100);
+      const respect = this.reader.readFloat();
+
+      // Skip to Sex Appeal: 0x140 (float)
+      this.reader.seek(blockStart + 0x140);
+      const sexAppeal = this.reader.readFloat();
+
+      return {
+        fat,
+        stamina,
+        muscle,
+        respect,
+        sexAppeal
+      };
+    } catch (e) {
+      console.error('Error reading player stats:', e);
+      return null;
+    }
   }
 
   private createDefaultPlayerStats(): PlayerStats {
