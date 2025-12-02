@@ -11,46 +11,59 @@ export class SaveFileParser {
   }
 
   public parse(): SaveData {
-    // Basic validation
-    if (this.buffer.byteLength < 200000) {
-      console.warn('File size seems too small for a GTA SA save file');
+    // Search for all occurrences of "BLOCK"
+    const blockPositions: number[] = [];
+    const searchBytes = new Uint8Array(this.buffer);
+
+    for (let i = 0; i < searchBytes.length - 4; i++) {
+      if (
+        searchBytes[i] === 66 &&      // 'B'
+        searchBytes[i + 1] === 76 &&  // 'L'
+        searchBytes[i + 2] === 79 &&  // 'O'
+        searchBytes[i + 3] === 67 &&  // 'C'
+        searchBytes[i + 4] === 75     // 'K'
+      ) {
+        blockPositions.push(i);
+      }
     }
 
-    // Reset reader
-    this.reader.seek(0);
+    // Verify we have enough blocks (minimum 28 for some variants)
+    if (blockPositions.length < 15) {
+      throw new Error(`Invalid save file: Found only ${blockPositions.length} BLOCK tags, expected at least 15`);
+    }
+
+    // Verify file starts with "BLOCK"
+    if (blockPositions[0] !== 0) {
+      throw new Error('Invalid save file: File must start with "BLOCK" tag');
+    }
+
+    console.log(`Found ${blockPositions.length} BLOCK tags in file`);
+    console.log(`File size: ${this.buffer.byteLength} bytes`);
 
     let player: PlayerStats = this.createDefaultPlayerStats();
     let progress: GameProgress = this.createDefaultGameProgress();
 
-    // We expect 30 blocks (0 to 29)
-    for (let i = 0; i < 30; i++) {
-      // Read Block Header
-      // "BLOCK" (5 bytes)
-      const tag = this.reader.readString(5);
-      if (tag !== 'BLOCK') {
-        console.warn(`Expected 'BLOCK' at offset ${this.reader.getOffset() - 5}, found '${tag}'`);
-      }
+    // Parse Block 15 (Ped Pool) for player stats
+    if (blockPositions.length > 15) {
+      try {
+        // Block 15 data starts after "BLOCK" (5 bytes) at position blockPositions[15]
+        const blockStart = blockPositions[15] + 5;
+        const blockEnd = blockPositions.length > 16 ? blockPositions[16] : this.buffer.byteLength;
+        const blockSize = blockEnd - blockStart;
 
-      // Read size (4 bytes, uint32)
-      const blockSize = this.reader.readUint32();
-      const nextBlockOffset = this.reader.getOffset() + blockSize;
+        console.log(`Parsing Block 15 (Ped Pool) at offset ${blockStart}, size ${blockSize}`);
 
-      // Parse specific blocks
-      if (i === 15) {
-        // Block 15: Ped Pool
-        console.log(`Parsing Block 15 (Ped Pool) at offset ${this.reader.getOffset()}`);
-        try {
-          const pedStats = this.parsePedPool(blockSize);
-          if (pedStats) {
-            player = { ...player, ...pedStats };
-          }
-        } catch (e) {
-          console.error('Failed to parse Ped Pool:', e);
+        this.reader.seek(blockStart);
+        const pedStats = this.parsePedPool(blockSize);
+        if (pedStats) {
+          player = { ...player, ...pedStats };
         }
+      } catch (e) {
+        console.error('Failed to parse Ped Pool:', e);
+        throw new Error(`Failed to parse player data (Block 15): ${(e as Error).message}`);
       }
-
-      // Skip to next block
-      this.reader.seek(nextBlockOffset);
+    } else {
+      console.warn('File does not have Block 15, using default player stats');
     }
 
     return {
