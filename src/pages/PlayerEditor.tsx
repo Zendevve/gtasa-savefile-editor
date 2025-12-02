@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSaveStore } from '../store/useSaveStore';
-import { Heart, Shield, DollarSign, Activity, Trophy, User } from 'lucide-react';
+import { Heart, Shield, DollarSign, Activity, Trophy, User, Download } from 'lucide-react';
+import { SaveFileWriter } from '../lib/parser/SaveFileWriter';
 
 export const PlayerEditor: React.FC = () => {
   const { saveData, updatePlayerStat } = useSaveStore();
+  const [isExporting, setIsExporting] = useState(false);
 
   if (!saveData) {
     return (
@@ -21,11 +23,54 @@ export const PlayerEditor: React.FC = () => {
     updatePlayerStat(stat, numValue);
   };
 
+  const handleExport = () => {
+    if (!saveData.rawBuffer) {
+      alert('No save file buffer available');
+      return;
+    }
+
+    try {
+      setIsExporting(true);
+
+      // Create writer and export modified buffer
+      const writer = new SaveFileWriter(saveData.rawBuffer);
+      const modifiedBuffer = writer.export(saveData);
+
+      // Create blob and download
+      const blob = new Blob([modifiedBuffer], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = saveData.fileName || 'GTASAsf_modified.b';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      console.log('Save file exported successfully');
+      setTimeout(() => setIsExporting(false), 1000);
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert(`Export failed: ${(error as Error).message}`);
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold text-white">Player Stats</h1>
-        <p className="text-neutral-400">Edit CJ's attributes, skills, and status</p>
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Player Stats</h1>
+          <p className="text-neutral-400">Edit CJ's attributes, skills, and status</p>
+        </div>
+        <button
+          onClick={handleExport}
+          disabled={isExporting}
+          className="flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 disabled:bg-neutral-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+        >
+          <Download size={20} />
+          {isExporting ? 'Exporting...' : 'Export Save File'}
+        </button>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
