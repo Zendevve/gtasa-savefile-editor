@@ -72,10 +72,10 @@ export const FileUpload: React.FC = () => {
   return (
     <div className="w-full">
       <div
-        className={`relative border-2 border-dashed rounded-xl p-8 transition-all duration-200 text-center cursor-pointer ${isDragging
-          ? 'border-primary-500 bg-primary-500/10'
-          : 'border-neutral-700 hover:border-neutral-600 bg-neutral-800/50'
-          } ${error ? 'border-red-500/50 bg-red-500/5' : ''}`}
+        className={`relative border-4 border-dashed border-black p-6 transition-all duration-100 text-center cursor-pointer ${isDragging
+          ? 'bg-brutal-yellow'
+          : 'bg-white hover:bg-neutral-100'
+          } ${error ? 'bg-red-100 border-red-600' : ''}`}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
@@ -90,25 +90,23 @@ export const FileUpload: React.FC = () => {
         />
 
         <div className="flex flex-col items-center pointer-events-none">
-          <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${isDragging
-            ? 'bg-primary-500/20 text-primary-500'
-            : error
-              ? 'bg-red-500/20 text-red-500'
-              : 'bg-neutral-700/50 text-neutral-400'
+          <div className={`w-16 h-16 border-4 border-black flex items-center justify-center mb-4 ${isDragging
+            ? 'bg-black text-brutal-yellow'
+            : 'bg-white text-black'
             }`}>
-            <Upload size={32} />
+            <Upload size={32} strokeWidth={3} />
           </div>
 
-          <h3 className="text-lg font-semibold text-white mb-2">
-            {isDragging ? 'Drop file here' : 'Drag & drop your save file'}
+          <h3 className="text-xl font-black text-black uppercase mb-1 tracking-tighter">
+            {isDragging ? 'DROP IT HERE!' : 'DRAG & DROP SAVE FILE'}
           </h3>
 
-          <p className="text-neutral-400 text-sm max-w-xs mx-auto mb-6">
-            Supports GTASAsf1.b through GTASAsf8.b files from standard PC versions
+          <p className="text-black font-mono text-xs max-w-xs mx-auto mb-6 bg-brutal-yellow px-2 inline-block -rotate-1">
+            Supports GTASAsf1.b - GTASAsf8.b
           </p>
 
           <button
-            className="btn-primary pointer-events-auto relative z-10"
+            className="brutal-btn pointer-events-auto relative z-10"
             onClick={(e) => {
               e.stopPropagation();
               handleClick();
@@ -120,8 +118,8 @@ export const FileUpload: React.FC = () => {
       </div>
 
       {error && (
-        <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center animate-in fade-in slide-in-from-top-2">
-          {error}
+        <div className="mt-6 p-4 bg-red-600 text-white border-4 border-black font-bold text-center uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          ERROR: {error}
         </div>
       )}
     </div>

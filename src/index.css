@@ -1,36 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-50: #f0fdf4;
-  --color-primary-100: #dcfce7;
-  --color-primary-500: #22c55e;
-  --color-primary-600: #16a34a;
-  --color-primary-900: #14532d;
+  --color-brutal-black: #000000;
+  --color-brutal-white: #ffffff;
+  --color-brutal-yellow: #ffff00;
+  --color-brutal-red: #ff0000;
 
-  --color-accent-purple: #a855f7;
-  --color-accent-blue: #3b82f6;
-
-  --color-neutral-50: #fafafa;
-  --color-neutral-100: #f5f5f5;
-  --color-neutral-800: #262626;
-  --color-neutral-900: #171717;
-
-  --radius-card: 12px;
+  --font-sans: 'Arial Black', 'Impact', sans-serif;
+  --font-mono: 'Courier New', 'Courier', monospace;
 }
 
 @layer base {
   :root {
-    font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-    font-weight: 400;
+    font-family: var(--font-mono);
+    line-height: 1.2;
+    font-weight: 700;
 
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
+    color-scheme: light;
+    color: var(--color-brutal-black);
+    background-color: var(--color-brutal-white);
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: grayscale;
   }
 
@@ -38,20 +30,37 @@
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
-    @apply bg-neutral-900 text-neutral-50;
+    background-image: radial-gradient(#000000 1px, transparent 1px);
+    background-size: 20px 20px;
+    @apply bg-brutal-white text-brutal-black;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
   }
 }
 
 @layer components {
-  .card {
-    @apply bg-neutral-800 rounded-card p-6 shadow-lg border border-neutral-700/50;
+  .brutal-card {
+    @apply bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_#000];
   }
 
-  .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-500 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  .brutal-btn {
+    @apply bg-brutal-yellow text-black border-4 border-black font-bold py-3 px-6 shadow-[4px_4px_0px_0px_#000] hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all duration-75 uppercase tracking-tighter;
   }
 
-  .btn-secondary {
-    @apply bg-neutral-700 hover:bg-neutral-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  .brutal-input {
+    @apply bg-white border-4 border-black p-3 font-mono text-lg focus:outline-none focus:bg-brutal-yellow/20;
+  }
+
+  .brutal-tag {
+    @apply bg-black text-white px-2 py-1 font-mono text-xs uppercase inline-block -rotate-2;
   }
 }
