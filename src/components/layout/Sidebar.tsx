@@ -1,5 +1,7 @@
-import React from 'react';
-import { LayoutDashboard, User, Crosshair, Car, Map, Save, Settings, FileUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { LayoutDashboard, User, Crosshair, Car, Map, Save, Settings, FileUp, Download } from 'lucide-react';
+import { useSaveStore } from '../../store/useSaveStore';
+import { exportSaveFile } from '../../lib/utils/exportSave';
 
 interface SidebarProps {
   activeTab: string;
@@ -7,6 +9,9 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
+  const { saveData, isDirty } = useSaveStore();
+  const [isExporting, setIsExporting] = useState(false);
+
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'player', label: 'Player', icon: User },
@@ -16,6 +21,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     { id: 'garages', label: 'Garages', icon: Save },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
+
+  const handleExport = async () => {
+    if (!saveData) return;
+
+    try {
+      setIsExporting(true);
+      exportSaveFile(saveData);
+      setTimeout(() => setIsExporting(false), 1000);
+    } catch (error) {
+      alert(`Export failed: ${(error as Error).message}`);
+      setIsExporting(false);
+    }
+  };
 
   return (
     <aside className="w-full lg:w-72 flex-shrink-0 flex flex-col gap-6 lg:sticky lg:top-8 h-fit z-10">
@@ -53,12 +71,32 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
         })}
       </nav>
 
-      <div className="mt-auto">
-        <button className="w-full flex items-center justify-center gap-3 px-4 py-4 bg-brutal-red text-white border-4 border-black font-bold shadow-[6px_6px_0px_0px_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_#000] transition-all uppercase">
-          <FileUp size={20} />
-          Upload Save
-        </button>
-      </div>
+      {saveData && (
+        <div className="mt-auto space-y-3">
+          {isDirty && (
+            <div className="bg-brutal-yellow border-4 border-black p-2 text-center font-mono text-xs font-bold uppercase animate-pulse">
+              ⚠ MODIFIED
+            </div>
+          )}
+          <button
+            onClick={handleExport}
+            disabled={isExporting}
+            className="w-full flex items-center justify-center gap-3 px-4 py-4 bg-brutal-red text-white border-4 border-black font-bold shadow-[6px_6px_0px_0px_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_#000] disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase"
+          >
+            <Download size={20} />
+            {isExporting ? 'EXPORTING...' : 'EXPORT SAVE'}
+          </button>
+        </div>
+      )}
+
+      {!saveData && (
+        <div className="mt-auto">
+          <button className="w-full flex items-center justify-center gap-3 px-4 py-4 bg-brutal-red text-white border-4 border-black font-bold shadow-[6px_6px_0px_0px_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_#000] transition-all uppercase">
+            <FileUp size={20} />
+            Upload Save
+          </button>
+        </div>
+      )}
     </aside>
   );
 };
