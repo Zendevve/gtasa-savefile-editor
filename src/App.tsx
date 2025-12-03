@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { AppLayout } from './components/layout/AppLayout';
 import { Dashboard } from './pages/Dashboard';
 import { PlayerEditor } from './pages/PlayerEditor';
+import { Weapons } from './pages/Weapons';
+import { Vehicles } from './pages/Vehicles';
+import { Missions } from './pages/Missions';
+import { Garages } from './pages/Garages';
+import { Settings } from './pages/Settings';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -13,15 +18,15 @@ function App() {
       case 'player':
         return <PlayerEditor />;
       case 'weapons':
-        return <div className="text-white">Weapons Editor (Coming Soon)</div>;
+        return <Weapons />;
       case 'vehicles':
-        return <div className="text-white">Vehicles Editor (Coming Soon)</div>;
+        return <Vehicles />;
       case 'missions':
-        return <div className="text-white">Missions Viewer (Coming Soon)</div>;
+        return <Missions />;
       case 'garages':
-        return <div className="text-white">Garages Editor (Coming Soon)</div>;
+        return <Garages />;
       case 'settings':
-        return <div className="text-white">Settings (Coming Soon)</div>;
+        return <Settings />;
       default:
         return <Dashboard />;
     }
