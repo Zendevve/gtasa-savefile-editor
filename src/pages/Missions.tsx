@@ -1,9 +1,9 @@
 import React from 'react';
 import { useSaveStore } from '../store/useSaveStore';
-import { Map } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 
 export const Missions: React.FC = () => {
-  const { saveData } = useSaveStore();
+  const { saveData, updateProgress } = useSaveStore();
 
   if (!saveData) {
     return (
@@ -18,6 +18,25 @@ export const Missions: React.FC = () => {
 
   const progress = saveData.progress;
 
+  const handleIncrement = (field: keyof typeof progress, max: number) => {
+    const current = progress[field] as number;
+    if (current < max) {
+      updateProgress(field, current + 1);
+    }
+  };
+
+  const handleDecrement = (field: keyof typeof progress) => {
+    const current = progress[field] as number;
+    if (current > 0) {
+      updateProgress(field, current - 1);
+    }
+  };
+
+  const handleChange = (field: keyof typeof progress, value: string) => {
+    const num = parseInt(value) || 0;
+    updateProgress(field, num);
+  };
+
   return (
     <div className="space-y-8">
       <header className="border-b-4 border-black pb-4">
@@ -26,70 +45,149 @@ export const Missions: React.FC = () => {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Main Missions */}
         <div className="brutal-card rotate-1 hover:rotate-0 transition-transform">
           <h3 className="text-black font-mono text-sm font-bold uppercase border-b-2 border-black pb-1 mb-4">Main Missions</h3>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center font-mono">
-              <span className="font-bold">Completed:</span>
-              <span className="text-2xl font-black">{progress.missionsCompleted}/{progress.totalMissions}</span>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <label className="font-mono font-bold text-sm">Completed:</label>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleDecrement('missionsCompleted')}
+                  className="w-8 h-8 bg-black text-white border-2 border-black hover:bg-neutral-800 flex items-center justify-center"
+                >
+                  <Minus size={16} />
+                </button>
+                <input
+                  type="number"
+                  value={progress.missionsCompleted}
+                  onChange={(e) => handleChange('missionsCompleted', e.target.value)}
+                  className="w-20 bg-white text-black border-4 border-black px-2 py-1 font-mono text-center font-bold focus:outline-none focus:bg-brutal-yellow"
+                />
+                <span className="font-mono font-bold">/ {progress.totalMissions}</span>
+                <button
+                  onClick={() => handleIncrement('missionsCompleted', progress.totalMissions)}
+                  className="w-8 h-8 bg-black text-white border-2 border-black hover:bg-neutral-800 flex items-center justify-center"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
             </div>
             <div className="h-6 border-4 border-black bg-white relative mt-4">
               <div
-                className="h-full bg-brutal-yellow absolute top-0 left-0 border-r-4 border-black"
+                className="h-full bg-brutal-yellow absolute top-0 left-0 border-r-4 border-black transition-all"
                 style={{ width: `${(progress.missionsCompleted / progress.totalMissions) * 100}%` }}
               />
             </div>
           </div>
         </div>
 
+        {/* Collectibles */}
         <div className="brutal-card -rotate-1 hover:rotate-0 transition-transform">
           <h3 className="text-black font-mono text-sm font-bold uppercase border-b-2 border-black pb-1 mb-4">Collectibles</h3>
           <div className="space-y-3 font-mono text-sm">
-            <div className="flex justify-between">
-              <span>Tags Sprayed:</span>
-              <span className="font-black">{progress.tagsSpray}/100</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Snapshots:</span>
-              <span className="font-black">{progress.snapshots}/50</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Horseshoes:</span>
-              <span className="font-black">{progress.horseshoes}/50</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Oysters:</span>
-              <span className="font-black">{progress.oysters}/50</span>
-            </div>
+            {[
+              { label: 'Tags Sprayed', field: 'tagsSpray' as const, max: 100 },
+              { label: 'Snapshots', field: 'snapshots' as const, max: 50 },
+              { label: 'Horseshoes', field: 'horseshoes' as const, max: 50 },
+              { label: 'Oysters', field: 'oysters' as const, max: 50 },
+            ].map((item) => (
+              <div key={item.field} className="flex items-center justify-between gap-2">
+                <span>{item.label}:</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleDecrement(item.field)}
+                    className="w-6 h-6 bg-black text-white border-2 border-black hover:bg-neutral-800 flex items-center justify-center"
+                  >
+                    <Minus size={12} />
+                  </button>
+                  <input
+                    type="number"
+                    value={progress[item.field]}
+                    onChange={(e) => handleChange(item.field, e.target.value)}
+                    className="w-16 bg-white text-black border-2 border-black px-1 text-center font-bold focus:outline-none focus:bg-brutal-yellow"
+                  />
+                  <span className="font-black">/{item.max}</span>
+                  <button
+                    onClick={() => handleIncrement(item.field, item.max)}
+                    className="w-6 h-6 bg-black text-white border-2 border-black hover:bg-neutral-800 flex items-center justify-center"
+                  >
+                    <Plus size={12} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* Territory */}
         <div className="brutal-card hover:rotate-1 transition-transform">
           <h3 className="text-black font-mono text-sm font-bold uppercase border-b-2 border-black pb-1 mb-4">Territory</h3>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center font-mono">
-              <span className="font-bold">Owned:</span>
-              <span className="text-2xl font-black">{progress.territoriesOwned}/{progress.territoriesTotal}</span>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <label className="font-mono font-bold text-sm">Owned:</label>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleDecrement('territoriesOwned')}
+                  className="w-8 h-8 bg-black text-white border-2 border-black hover:bg-neutral-800 flex items-center justify-center"
+                >
+                  <Minus size={16} />
+                </button>
+                <input
+                  type="number"
+                  value={progress.territoriesOwned}
+                  onChange={(e) => handleChange('territoriesOwned', e.target.value)}
+                  className="w-20 bg-white text-black border-4 border-black px-2 py-1 font-mono text-center font-bold focus:outline-none focus:bg-brutal-yellow"
+                />
+                <span className="font-mono font-bold">/ {progress.territoriesTotal}</span>
+                <button
+                  onClick={() => handleIncrement('territoriesOwned', progress.territoriesTotal)}
+                  className="w-8 h-8 bg-black text-white border-2 border-black hover:bg-neutral-800 flex items-center justify-center"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
             </div>
             <div className="h-6 border-4 border-black bg-white relative mt-4">
               <div
-                className="h-full bg-brutal-red absolute top-0 left-0 border-r-4 border-black"
+                className="h-full bg-brutal-red absolute top-0 left-0 border-r-4 border-black transition-all"
                 style={{ width: `${(progress.territoriesOwned / progress.territoriesTotal) * 100}%` }}
               />
             </div>
           </div>
         </div>
 
+        {/* Unique Jumps */}
         <div className="brutal-card hover:-rotate-1 transition-transform">
           <h3 className="text-black font-mono text-sm font-bold uppercase border-b-2 border-black pb-1 mb-4">Unique Jumps</h3>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center font-mono">
-              <span className="font-bold">Completed:</span>
-              <span className="text-2xl font-black">{progress.uniqueJumps}/70</span>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <label className="font-mono font-bold text-sm">Completed:</label>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleDecrement('uniqueJumps')}
+                  className="w-8 h-8 bg-black text-white border-2 border-black hover:bg-neutral-800 flex items-center justify-center"
+                >
+                  <Minus size={16} />
+                </button>
+                <input
+                  type="number"
+                  value={progress.uniqueJumps}
+                  onChange={(e) => handleChange('uniqueJumps', e.target.value)}
+                  className="w-20 bg-white text-black border-4 border-black px-2 py-1 font-mono text-center font-bold focus:outline-none focus:bg-brutal-yellow"
+                />
+                <span className="font-mono font-bold">/ 70</span>
+                <button
+                  onClick={() => handleIncrement('uniqueJumps', 70)}
+                  className="w-8 h-8 bg-black text-white border-2 border-black hover:bg-neutral-800 flex items-center justify-center"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
             </div>
             <div className="h-6 border-4 border-black bg-white relative mt-4">
               <div
-                className="h-full bg-black absolute top-0 left-0 border-r-4 border-black"
+                className="h-full bg-black absolute top-0 left-0 border-r-4 border-black transition-all"
                 style={{ width: `${(progress.uniqueJumps / 70) * 100}%` }}
               />
             </div>
