@@ -10,6 +10,13 @@ export interface PlayerStats {
   respect: number;
   sexAppeal: number;
   luck: number;
+  // New skills for feature parity
+  lungCapacity: number;
+  cyclingSkill: number;
+  bikeSkill: number;
+  drivingSkill: number;
+  flyingSkill: number;
+  gamblingSkill: number;
 }
 
 export interface Weapon {

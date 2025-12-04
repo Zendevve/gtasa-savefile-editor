@@ -7,6 +7,8 @@ import { Vehicles } from './pages/Vehicles';
 import { Missions } from './pages/Missions';
 import { Garages } from './pages/Garages';
 import { Settings } from './pages/Settings';
+import { General } from './pages/General';
+import { Fixes } from './pages/Fixes';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -15,6 +17,8 @@ function App() {
     switch (activeTab) {
       case 'dashboard':
         return <Dashboard />;
+      case 'general':
+        return <General />;
       case 'player':
         return <PlayerEditor />;
       case 'weapons':
@@ -25,6 +29,8 @@ function App() {
         return <Missions />;
       case 'garages':
         return <Garages />;
+      case 'fixes':
+        return <Fixes />;
       case 'settings':
         return <Settings />;
       default:
@@ -40,3 +46,4 @@ function App() {
 }
 
 export default App;
+

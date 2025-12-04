@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, User, Crosshair, Car, Map, Save, Settings, FileUp, Download } from 'lucide-react';
+import { LayoutDashboard, User, Crosshair, Car, Map, Save, Settings, FileUp, Download, Sliders, Wrench } from 'lucide-react';
 import { useSaveStore } from '../../store/useSaveStore';
 import { exportSaveFile } from '../../lib/utils/exportSave';
 
@@ -14,11 +14,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'general', label: 'General', icon: Sliders },
     { id: 'player', label: 'Player', icon: User },
     { id: 'weapons', label: 'Weapons', icon: Crosshair },
     { id: 'vehicles', label: 'Vehicles', icon: Car },
     { id: 'missions', label: 'Missions', icon: Map },
     { id: 'garages', label: 'Garages', icon: Save },
+    { id: 'fixes', label: 'Fixes', icon: Wrench },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 

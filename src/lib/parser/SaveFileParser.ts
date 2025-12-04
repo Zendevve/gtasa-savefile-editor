@@ -138,8 +138,9 @@ export class SaveFileParser {
 
   private parsePlayerStats(blockStart: number, blockSize: number): Partial<PlayerStats> | null {
     // Block 16 contains player stats like fat, stamina, muscle, respect, etc.
+    // Offsets from reference/libsavegame/blocks/Block16.java
 
-    if (blockSize < 0x150) {
+    if (blockSize < 0x340) {
       console.warn('Block 16 too small for player stats');
       return null;
     }
@@ -155,20 +156,52 @@ export class SaveFileParser {
       // Muscle: 0x5C (float)
       const muscle = this.reader.readFloat();
 
-      // Skip to Respect: 0x100 (float)
+      // Max Health: 0x60 (float)
+      const maxHealth = this.reader.readFloat();
+
+      // Respect: 0x100 (float)
       this.reader.seek(blockStart + 0x100);
       const respect = this.reader.readFloat();
 
-      // Skip to Sex Appeal: 0x140 (float)
+      // Sex Appeal: 0x140 (float)
       this.reader.seek(blockStart + 0x140);
       const sexAppeal = this.reader.readFloat();
+
+      // Gambling Skill: 0x144 (float)
+      const gamblingSkill = this.reader.readFloat();
+
+      // Driving Skill: 0x1e8 (int)
+      this.reader.seek(blockStart + 0x1e8);
+      const drivingSkill = this.reader.readInt32();
+
+      // Flying Skill: 0x2e4 (int)
+      this.reader.seek(blockStart + 0x2e4);
+      const flyingSkill = this.reader.readInt32();
+
+      // Lung Capacity: 0x2ec (int)
+      this.reader.seek(blockStart + 0x2ec);
+      const lungCapacity = this.reader.readInt32();
+
+      // Bike Skill: 0x2fc (int)
+      this.reader.seek(blockStart + 0x2fc);
+      const bikeSkill = this.reader.readInt32();
+
+      // Cycling Skill: 0x300 (int)
+      const cyclingSkill = this.reader.readInt32();
 
       return {
         fat,
         stamina,
         muscle,
+        maxHealth,
         respect,
-        sexAppeal
+        sexAppeal,
+        gamblingSkill,
+        drivingSkill,
+        flyingSkill,
+        lungCapacity,
+        bikeSkill,
+        cyclingSkill
       };
     } catch (e) {
       console.error('Error reading player stats:', e);
@@ -188,7 +221,13 @@ export class SaveFileParser {
       fat: 0,
       respect: 0,
       sexAppeal: 0,
-      luck: 0
+      luck: 0,
+      lungCapacity: 0,
+      cyclingSkill: 0,
+      bikeSkill: 0,
+      drivingSkill: 0,
+      flyingSkill: 0,
+      gamblingSkill: 0
     };
   }
 

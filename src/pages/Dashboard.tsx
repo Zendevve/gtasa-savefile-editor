@@ -36,7 +36,13 @@ export const Dashboard: React.FC = () => {
                     fat: 100,
                     respect: 40,
                     sexAppeal: 30,
-                    luck: 10
+                    luck: 10,
+                    lungCapacity: 500,
+                    cyclingSkill: 200,
+                    bikeSkill: 300,
+                    drivingSkill: 400,
+                    flyingSkill: 100,
+                    gamblingSkill: 50
                   },
                   weapons: [],
                   garages: [],
@@ -117,7 +123,13 @@ export const Dashboard: React.FC = () => {
                 fat: 100,
                 respect: 40,
                 sexAppeal: 30,
-                luck: 10
+                luck: 10,
+                lungCapacity: 500,
+                cyclingSkill: 200,
+                bikeSkill: 300,
+                drivingSkill: 400,
+                flyingSkill: 100,
+                gamblingSkill: 50
               },
               weapons: [],
               garages: [],
